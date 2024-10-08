@@ -1,0 +1,25 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Login - Grocery Store
+{% endblock %}
+
+
+{% block body %}
+<div class="container-fluid mt-5">
+    <h1 class="text-center">Login</h1>
+    <form class="row justify-content-center" action="/login" method = "POST">
+        <div class="mb-3 col-7">
+          <label for="email_id" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="email_id" name = "email">
+        </div>
+        <div class="mb-3 col-7">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password">
+        </div>
+        <div class="col-7">
+            <button  type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
+</div>
+{% endblock %}
