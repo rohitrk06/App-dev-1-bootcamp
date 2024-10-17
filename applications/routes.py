@@ -1,9 +1,14 @@
-from flask import render_template, request, session, flash, redirect
+from flask import render_template, request, session, flash, redirect, url_for
 from main import app
 from applications.models import *
+from datetime import datetime
 
 @app.route('/')
 def index():
+    if 'user_email' in session:
+        categories = Categories.query.all()
+        products = Products.query.all()
+        return render_template('home.html', categories=categories, products=products)
     return render_template('home.html')
 
 @app.route('/login', methods=['GET','POST'])
@@ -34,7 +39,7 @@ def login():
         session['user_role'] = user.roles[0].name
         flash('Login successful')
 
-        return render_template('home.html')
+        return redirect(url_for('index'))
     
 @app.route('/logout')
 def logout():
@@ -89,4 +94,81 @@ def register():
         flash('User registered successfully')
         return redirect('/login')
 
+@app.route('/add_category', methods=['GET','POST'])
+def add_category():
+    if request.method == 'GET':
+        return render_template('add_category.html')
+    
+    if request.method == 'POST':
+        name = request.form.get('name',None)
+        description = request.form.get('description',None)
 
+        #data validation
+        if not name:
+            flash('Please enter category name')
+            return render_template('add_category.html')
+        
+        category = Categories.query.filter_by(name=name).first()
+        if category:
+            flash('Category already exists')
+            return render_template('add_category.html')
+        
+        category = Categories(name=name, decsription=description)
+        db.session.add(category)
+        db.session.commit()
+
+        flash('Category added successfully')
+        return redirect(url_for('index'))
+
+
+@app.route('/add_product', methods=['GET','POST'])
+def add_product():
+    if request.method == 'GET':
+        categories = Categories.query.all()
+        return render_template('add_product.html', categories=categories)
+    
+    if request.method == 'POST':
+        name = request.form.get('name',None) 
+        selling_price = request.form.get('selling_price',None)
+        cost_price = request.form.get('cost_price',None)
+        stock = request.form.get('stock',None)
+        category_id = request.form.get('category',None)
+        mfg_date = request.form.get('mfg_date',None)
+        exp_date = request.form.get('expiry_date',None)
+        # name = request.form['name'] 
+        # 
+
+        mfg_date = datetime.strptime(mfg_date, '%Y-%m-%d')
+        exp_date = datetime.strptime(exp_date, '%Y-%m-%d')
+
+        #data validation
+        if not name or not selling_price or not cost_price or not stock or not category_id or not mfg_date or not exp_date:
+            flash('Please enter all fields')
+            return render_template('add_product.html')
+                
+        product = Products.query.filter_by(name=name).first()
+        if product:
+            flash('Product already exists')
+            return render_template('add_product.html')
+        
+        # if exp_date < datetime.now():
+        #     flash('Expiry date cannot be in the past')
+        #     return render_template('add_product.html')
+        category = Categories.query.get(category_id)
+        if not category:
+            flash('Invalid category')
+            return render_template('add_product.html')
+        
+        product = Products(name=name,
+                            selling_price=selling_price,
+                            cost_price=cost_price,
+                            stock=stock,
+                            manufactering_date=mfg_date,
+                            expiry_date=exp_date,
+                            category_id=category_id)
+        
+        db.session.add(product)
+        db.session.commit()
+
+        flash('Product added successfully')
+        return redirect(url_for('index'))

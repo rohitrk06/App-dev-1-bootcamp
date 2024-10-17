@@ -2,11 +2,20 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from applications.config import Config
 from applications.database import db
-from applications.models import User, Role, UserRole
+from applications.models import User, Role, UserRole, Products
+
+##
+from flask_restful import Api, Resource
+##
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    ##
+    api = Api(app)
+    ##
+
     db.init_app(app)
     with app.app_context():
         db.create_all()
@@ -31,11 +40,33 @@ def create_app():
                               roles = [admin_role])
             db.session.add(admin_user)
         db.session.commit()
-    return app
+    # return app
 
-app = create_app()
+    ##
+    return app, api
+    ##
+
+# app = create_app()
+app, api = create_app()
 
 from applications.routes import *
+
+class getAllProducts(Resource):
+    def get(self):
+        products = Products.query.all()
+        response = []
+        for product in products:
+            response.append({
+                'id': product.id,
+                'name': product.name,
+                'selling_price': product.selling_price,
+                'cost_price': product.cost_price,
+                'stock': product.stock
+                })
+        return response
+        
+api.add_resource(getAllProducts, '/get_all_products')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

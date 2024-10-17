@@ -1,0 +1,50 @@
+{% extends 'index.html' %}
+
+{% block title %}
+Add Product - Grocery Store
+{% endblock %}
+
+
+{% block body %}
+<div class="container-fluid mt-5">
+    <h1 class="text-center">Add Product</h1>
+    <form class="row justify-content-center" action={{url_for('add_product')}} method = "POST">
+        <div class="mb-3 col-7">
+          <label for="name" class="form-label">Product Name</label>
+          <input type="text" class="form-control" id="name" name = "name" required>
+        </div>
+        <div class="mb-3 col-7">
+          <label for="selling_price" class="form-label">Selling Price</label>
+          <input type="text" class="form-control" id="selling_price" name="selling_price">
+        </div>
+        <div class="mb-3 col-7">
+            <label for="cost_price" class="form-label">Cost Price</label>
+            <input type="text" class="form-control" id="cost_price" name="cost_price">
+        </div>
+        <div class="mb-3 col-7">
+            <label for="stock" class="form-label">Stock</label>
+            <input type="number" class="form-control" id="stock" name="stock">
+        </div>
+        <div class="mb-3 col-7">
+            <label for="mfg_date" class="form-label">Manufacturing Date</label>
+            <input type="date" class="form-control" id="mfg_date" name="mfg_date">
+        </div>
+        <div class="mb-3 col-7">
+            <label for="expiry_date" class="form-label">Expiry Date</label>
+            <input type="date" class="form-control" id="expiry_date" name="expiry_date">
+        </div>
+        <div class="mb-3 col-7">
+            <label for="category" class="form-label">Category</label>
+            <select class="form-select" id="category" name="category">
+                {% for category in categories %}
+                    <option value="{{category.id}}">{{category.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-7">
+            <button  type="submit" class="btn btn-primary">Add Product</button>
+        </div>
+
+      </form>
+</div>
+{% endblock %}

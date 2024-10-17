@@ -1,1 +1,90 @@
 {% extends 'index.html' %}
+
+{% block title %} Home - Grocery Store {% endblock %}
+
+{% block body %}
+<div>
+    {% if not session['user_email'] %}
+    <h1 class="text-center">Welcome to Grocery Store</h1>
+    <p class="text-center">This is a simple grocery store application</p>
+    <p class="text-center">You can add categories and products</p>  
+    <p class="text-center">You can also view the products</p>
+    <p class="text-center">You can also search for products</p>
+    <a href="{{url_for('login')}}" class="btn btn-primary">Login</a>
+    {% endif %}
+
+    {% if session['user_email'] %}
+    <h1 class="text-center">Welcome to Grocery Store</h1>'
+    <h3>Categories</h3>
+    <div>
+        <table>
+            <tr>
+                <th>Category Name</th>
+                <th>Description</th>
+                {% if 'admin' in session['user_role'] %}
+                <th>Action</th>
+                {% endif %}
+            </tr>
+            {% for category in categories %}
+            <tr>
+                <td>{{category.name}}</td>
+                <td>{{category.description}}</td>
+                {% if 'admin' in session['user_role'] %}
+                <td>
+                    <a href="#">Edit</a>
+                    <a href="#">Delete</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <h3>Products</h3>
+    <div>
+        <table>
+            <tr>
+                <th>Product Name</th>
+                <th>Selling Price</th>
+                {% if 'customer' not in session['user_role'] %}
+                <th>Cost Price</th>
+                {% endif %}
+                <th>Stock</th>
+                <th>Manufacturing Date</th>
+                <th>Expiry Date</th>
+                <th>Category</th>
+                {% if 'admin' not in session['user_role'] %}
+                <th>Action</th>
+                {% endif %}
+            </tr>
+            {% for product in products %}
+            <tr>
+                <td>{{product.name}}</td>
+                <td>{{product.selling_price}}</td>
+                {% if 'customer' not in session['user_role'] %}
+                <td>{{product.cost_price}}</td>
+                {% endif %}
+                <td>{{product.stock}}</td>
+                <td>{{product.mfg_date}}</td>
+                <td>{{product.expiry_date}}</td>
+                <td>{{product.category.name}}</td>
+                {% if 'store_manager' in session['user_role'] %}
+                <td>
+                    <a href="#">Edit</a>
+                    <a href="#">Delete</a>
+                </td>
+                {% endif %}
+                {% if 'customer' in session['user_role'] %}
+                <td>
+                    <form>
+                        <input type="number" name="quantity" value="1">
+                        <button type="submit">Add to Cart</button>
+                    </form>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+</div>
+{% endblock %}
