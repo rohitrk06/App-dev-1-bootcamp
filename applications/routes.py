@@ -120,6 +120,39 @@ def add_category():
         flash('Category added successfully')
         return redirect(url_for('index'))
 
+@app.route('/edit_category/<int:id>',methods=['GET','POST'])
+def edit_category(id):
+    category = Categories.query.get(id)
+    if not category:
+        flash('Category does not exist')
+        return redirect(url_for('index'))
+    
+    if request.method == 'GET':
+        return render_template('edit_category.html', category=category)
+    
+    if request.method == 'POST':
+        name = request.form.get('name',None)
+        description = request.form.get('description',None)
+        
+        category.name = name
+        category.decsription = description
+        db.session.commit()
+
+        flash('Category updated successfully')
+        return redirect(url_for('index'))
+
+@app.route('/delete_category/<int:id>', methods=['GET'])
+def delete_category(id):
+    category = Categories.query.get(id)
+    if not category:
+        flash('Category does not exist')
+
+    db.session.delete(category)
+    db.session.commit()
+    flash('Category deleted successfully')
+    return redirect(url_for('index'))
+
+ 
 
 @app.route('/add_product', methods=['GET','POST'])
 def add_product():
@@ -172,3 +205,26 @@ def add_product():
 
         flash('Product added successfully')
         return redirect(url_for('index'))
+
+
+@app.route('/delete_product/<int:id>', methods=['GET'])
+def delete_product(id):
+    product = Products.query.get(id)
+    if not product:
+        flash('Product does not exist')
+
+    db.session.delete(product)
+    db.session.commit()
+    flash('Product deleted successfully')
+    return redirect(url_for('index'))
+
+
+@app.route('/search', methods=['POST'])
+def search():
+    query = request.form.get('query', None)
+    if not query:
+        flash('Please enter search query')
+
+    products = Products.query.filter(Products.name.ilike(f'%{query}%')).all()
+    categories = Categories.query.filter(Categories.name.ilike(f'%{query}%')).all()
+    return render_template('home.html', products=products, categories=categories)

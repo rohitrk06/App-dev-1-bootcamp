@@ -1,0 +1,25 @@
+{% extends 'index.html' %}
+
+{% block title %} Search Results - Grocery Store {% endblock %}
+
+{% block body %}
+<div>
+    <h1 class="text-center">Search Results</h1>
+    <div>
+        <h3>Categories</h3>
+        <ul>
+            {% for category in categories %}
+            <li>{{category.name}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>
+        <h3>Products</h3>
+        <ul>
+            {% for product in products %}
+            <li>{{product.name}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
